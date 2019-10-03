@@ -8,7 +8,7 @@ const Products = ({products,handleAddToCart}) =>{
 	products.map(product => 
 		<div className="col-md-4">
 		<div className="thumbnail text-center">
-		<img src={`data/products/${product.sku}_2.jpg`} alt={product.title}/>
+
 		<p> {product.title}</p>
 		<b>{`$${product.price}`}</b>
 		<p><Button onClick={handleAddToCart(cart,product)}> Add To Cart </Button></p>

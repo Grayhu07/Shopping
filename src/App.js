@@ -20,7 +20,7 @@ const App = () => {
   }, []);
 
   const handleAddToCart = function (cart,product){
-  	
+
   }
 
   return (
