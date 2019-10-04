@@ -2,21 +2,26 @@ import React from 'react';
 import 'rbx/index.css';
 import { Button, Container, Title } from 'rbx';
 
-const cart=[];
+const Cart = ({cartItems,handleRemoveFromCart}) =>{
 
-const Cart = ({cartItems}) =>{
-	if(!cartItems){
-		return(<p>no items</p>)
+	const calculator = ({cartItems})=>{
+		let total =0;
+		cartItems.map(item=>{
+			total += (item.product.price * item.count);
+		})
+		return total.toFixed(2);
 	}
+
 	return(
-		cartItems.map(product => 
-		<div className="col-md-4">
-		<div className="thumbnail text-center">
-		<p> <Button> {product.title} </Button> </p>
-		</div>
-		</div>
-	)
+		<Container>
+		{!cartItems.length ? "no item" : <div> you have {cartItems.length} products </div>}
+		<p>{cartItems.length ? cartItems.map(item=><p>{item.product.title} size {item.size} x {item.count}  <Button className="btn btn-danger"
+		onClick={(e)=> handleRemoveFromCart(e,item.product,item.size)}>
+		 X </Button></p>) : ""}</p>
+		<div> total is : $ {calculator({cartItems})}</div>
+		<p><button>check out</button></p>
+		</Container>
 	)
 }
 
-export{cart,Cart}
+export{Cart}
