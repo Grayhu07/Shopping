@@ -3,9 +3,11 @@ import {Products} from './components/products';
 import {Cart} from './components/cart';
 import './App.css';
 import 'rbx/index.css'
-import {Button, Container, Title} from 'rbx';
+import {Button, Container, Title,Message} from 'rbx';
 import firebase from 'firebase/app';
 import 'firebase/database';
+import 'firebase/auth';
+import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 
 //firebase
 const firebaseConfig = {
@@ -21,6 +23,23 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database().ref();
 
+const uiConfig = {
+  signInFlow: 'popup',
+  signInOptions: [
+    firebase.auth.GoogleAuthProvider.PROVIDER_ID
+  ],
+  callbacks: {
+    signInSuccessWithAuthResult: () => false
+  }
+};
+
+const SignIn = () => (
+  <StyledFirebaseAuth
+    uiConfig={uiConfig}
+    firebaseAuth={firebase.auth()}
+  />
+);
+
  const useSelection = () => {
   	const [selected, setSelected] = useState([]);
   	const addToCart = (x) => {
@@ -34,6 +53,7 @@ const App = () => {
   const products = Object.values(data);
   const [cartItems, setCartItems] = useState([]);
   const [sort,setSort] = useState([]);
+  const [user, setUser] = useState(null);
   useEffect(() => {
     const fetchProducts = async () => {
       const response = await fetch('./data/products.json');
@@ -51,11 +71,15 @@ const App = () => {
     fetchProducts();
   }, []);
 
+    useEffect(() => {
+    firebase.auth().onAuthStateChanged(setUser);
+  }, []);
+
    const handleAddToCart = function (e,product,productSize){
    	if(!productSize){
    		alert('Please Select A Size');
    		return('Please Select A Size')
-   	}
+   		}
    	let InCart=false;
    	let cart=[];
    	cartItems.map(item=>{
@@ -63,7 +87,7 @@ const App = () => {
    			InCart = true;
    			item.count++;
 	   	}
-	   	cart.push(item);
+	   	cart.push(item)
    	});
    	if(!InCart){
    		cart.push({product,count:1,size:productSize});
@@ -89,6 +113,17 @@ const App = () => {
     <Container>
       <Title> Shopping Cart Application</Title>
       <hr />
+      <React.Fragment>
+      {user ? <Message color="info">
+      <Message.Header>
+      Welcome, {user.displayName}
+      <Button primary onClick={() => firebase.auth().signOut()}>
+      	Log Out
+      </Button>
+      </Message.Header>
+      </Message> : <SignIn/>}
+
+      </React.Fragment>
       <div className = "row">
       <div className = "col-md-8">
       <hr />

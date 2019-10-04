@@ -17,7 +17,7 @@ const Cart = ({cartItems,handleRemoveFromCart}) =>{
 		{!cartItems.length ? "no item" : <div> you have {cartItems.length} products </div>}
 		<p>{cartItems.length ? cartItems.map(item=><p>{item.product.title} size {item.size} x {item.count}  <Button className="btn btn-danger"
 		onClick={(e)=> handleRemoveFromCart(e,item.product,item.size)}>
-		 X </Button></p>) : ""}</p>
+		 X </Button></p>) : ''}</p>
 		<div> total is : $ {calculator({cartItems})}</div>
 		<p><button>check out</button></p>
 		</Container>
