@@ -4,6 +4,22 @@ import {Cart} from './components/cart';
 import './App.css';
 import 'rbx/index.css'
 import {Button, Container, Title} from 'rbx';
+import firebase from 'firebase/app';
+import 'firebase/database';
+
+//firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyDyFFvrphsMciZPJjncnkCLFUrKSl9JkI0",
+  authDomain: "shopping-cart-f5746.firebaseapp.com",
+  databaseURL: "https://shopping-cart-f5746.firebaseio.com",
+  projectId: "shopping-cart-f5746",
+  storageBucket: "",
+  messagingSenderId: "7818256059",
+  appId: "1:7818256059:web:5a094e834d9287de01939e"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database().ref();
 
  const useSelection = () => {
   	const [selected, setSelected] = useState([]);
@@ -17,16 +33,29 @@ const App = () => {
   const [data, setData] = useState({});
   const products = Object.values(data);
   const [cartItems, setCartItems] = useState([]);
+  const [sort,setSort] = useState([]);
   useEffect(() => {
     const fetchProducts = async () => {
       const response = await fetch('./data/products.json');
       const json = await response.json();
-      setData(json);
+      const handleData = add_new =>{
+      	if(add_new.val()){
+      		let result = {}
+      		Object.keys(json).map(x=>{result[x] = Object.assign(json[x],add_new.val()[x])});
+      		setData(json);
+      	}
+      };
+      db.on('value',handleData,error=>alert(error));
+      return () => {db.off('value',handleData)};
     };
     fetchProducts();
   }, []);
 
    const handleAddToCart = function (e,product,productSize){
+   	if(!productSize){
+   		alert('Please Select A Size');
+   		return('Please Select A Size')
+   	}
    	let InCart=false;
    	let cart=[];
    	cartItems.map(item=>{
@@ -43,7 +72,6 @@ const App = () => {
    };
 
    const handleRemoveFromCart = function(e,product,productSize){
-   	let InCart=true;
    	let cart=[];
    	cartItems.map(item=>{
    		if((item.product.sku===product.sku)&&(item.size===productSize)){
@@ -56,12 +84,14 @@ const App = () => {
    	setCartItems(cart);
    }
 
+
   return (
     <Container>
       <Title> Shopping Cart Application</Title>
       <hr />
       <div className = "row">
       <div className = "col-md-8">
+      <hr />
       <Products products = {products} handleAddToCart={handleAddToCart}/>
       </div>
       <div className="col-md-4">
